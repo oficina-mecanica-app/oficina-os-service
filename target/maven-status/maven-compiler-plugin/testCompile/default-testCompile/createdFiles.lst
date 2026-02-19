@@ -1,0 +1,11 @@
+br/com/fiap/oficina/infrastructure/persistence/entity/ServiceDataTest.class
+br/com/fiap/oficina/infrastructure/configuration/SagaConsumerTest.class
+br/com/fiap/oficina/presentation/dto/VehicleResponseTest.class
+br/com/fiap/oficina/bdd/CucumberTest.class
+br/com/fiap/oficina/presentation/controller/ServiceOrderControllerTest.class
+br/com/fiap/oficina/bdd/ServiceOrderSteps.class
+br/com/fiap/oficina/application/service/ClientServiceTest.class
+br/com/fiap/oficina/infrastructure/persistence/entity/ClientDataTest.class
+br/com/fiap/oficina/application/service/ServiceOrderServiceTest.class
+br/com/fiap/oficina/application/service/VehicleServiceTest.class
+br/com/fiap/oficina/infrastructure/service/EmailServiceTest.class
