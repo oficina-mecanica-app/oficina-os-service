@@ -14,14 +14,13 @@ spec:
     spec:
       containers:
       - name: os-service
-        # ATENÇÃO: Você precisará buildar essa imagem com esse nome ou usar seu Docker Hub
-        image: oficina-os-service:latest 
-        imagePullPolicy: Never # Use 'Never' ou 'IfNotPresent' se estiver rodando local com Minikube/Docker Desktop
+        image: lucasscuissiatto/oficina-os-service:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:
         - name: SPRING_DATASOURCE_URL
-          value: "jdbc:postgresql://postgres-service:5432/oficina_os" # Note que aponta para o serviço do repo de infra
+          value: "jdbc:postgresql://postgres-service:5432/oficina_os"
         - name: SPRING_DATASOURCE_USERNAME
           value: "admin"
         - name: SPRING_DATASOURCE_PASSWORD

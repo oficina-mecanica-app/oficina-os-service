@@ -7,5 +7,6 @@ public enum OrderStatus {
     REFUSED,            // Recusado
     IN_PROGRESS,        // Em Execução
     COMPLETED,          // Finalizada
-    DELIVERED;          // Entregue
+    DELIVERED,          // Entregue
+    CANCELED;           // Cancelada
 }
