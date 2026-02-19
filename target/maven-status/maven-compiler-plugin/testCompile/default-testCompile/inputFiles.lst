@@ -1,0 +1,11 @@
+/Users/lucasscuissiatto/Projects/tech-challenge-fase4/oficina-os-service/src/test/java/br/com/fiap/oficina/application/service/ClientServiceTest.java
+/Users/lucasscuissiatto/Projects/tech-challenge-fase4/oficina-os-service/src/test/java/br/com/fiap/oficina/application/service/ServiceOrderServiceTest.java
+/Users/lucasscuissiatto/Projects/tech-challenge-fase4/oficina-os-service/src/test/java/br/com/fiap/oficina/application/service/VehicleServiceTest.java
+/Users/lucasscuissiatto/Projects/tech-challenge-fase4/oficina-os-service/src/test/java/br/com/fiap/oficina/bdd/CucumberTest.java
+/Users/lucasscuissiatto/Projects/tech-challenge-fase4/oficina-os-service/src/test/java/br/com/fiap/oficina/bdd/ServiceOrderSteps.java
+/Users/lucasscuissiatto/Projects/tech-challenge-fase4/oficina-os-service/src/test/java/br/com/fiap/oficina/infrastructure/configuration/SagaConsumerTest.java
+/Users/lucasscuissiatto/Projects/tech-challenge-fase4/oficina-os-service/src/test/java/br/com/fiap/oficina/infrastructure/persistence/entity/ClientDataTest.java
+/Users/lucasscuissiatto/Projects/tech-challenge-fase4/oficina-os-service/src/test/java/br/com/fiap/oficina/infrastructure/persistence/entity/ServiceDataTest.java
+/Users/lucasscuissiatto/Projects/tech-challenge-fase4/oficina-os-service/src/test/java/br/com/fiap/oficina/infrastructure/service/EmailServiceTest.java
+/Users/lucasscuissiatto/Projects/tech-challenge-fase4/oficina-os-service/src/test/java/br/com/fiap/oficina/presentation/controller/ServiceOrderControllerTest.java
+/Users/lucasscuissiatto/Projects/tech-challenge-fase4/oficina-os-service/src/test/java/br/com/fiap/oficina/presentation/dto/VehicleResponseTest.java

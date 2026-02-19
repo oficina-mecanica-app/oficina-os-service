@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: os-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: os-service
+  template:
+    metadata:
+      labels:
+        app: os-service
+    spec:
+      containers:
+      - name: os-service
+        # ATENÇÃO: Você precisará buildar essa imagem com esse nome ou usar seu Docker Hub
+        image: oficina-os-service:latest 
+        imagePullPolicy: Never # Use 'Never' ou 'IfNotPresent' se estiver rodando local com Minikube/Docker Desktop
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://postgres-service:5432/oficina_os" # Note que aponta para o serviço do repo de infra
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "admin"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "admin_password"
+        - name: SPRING_RABBITMQ_HOST
+          value: "rabbitmq-service"
+        - name: SPRING_MAIL_HOST
+          value: "mailhog-service"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: os-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: os-service
+  ports:
+  - port: 8080
+    targetPort: 8080
