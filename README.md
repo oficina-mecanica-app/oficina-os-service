@@ -31,6 +31,8 @@ Este serviço funciona como o ponto de partida e de chegada de todo o processo:
 ## 📥 Filas de Entrada (Consumer)
 
 * `os-payment-approved-queue`: Recebe a confirmação de pagamento do Billing Service.
+* `payment-refused-queue`: Recebe a recusa de pagamento (compensação da saga: a OS vai para `REFUSED`).
+* `payment-link-generated-queue`: Recebe o link de pagamento e o envia por e-mail ao cliente.
 * `execution-finished-queue`: Recebe a notificação de serviço concluído do Execution Service.
 
 ## 📤 Fila de Saída (Producer)
@@ -48,7 +50,7 @@ Focado na cobertura de Controllers, Services e Repositories.
 
 ```bash
 # Executar testes e gerar relatório JaCoCo
-mvn clean verify
+./mvnw clean verify
 
 # Enviar para o SonarQube local
 mvn sonar:sonar \
@@ -63,11 +65,20 @@ Utilizamos **Cucumber** para validar cenários de negócio em linguagem natural 
 * **Cenário Validado**: Criação de Ordem de Serviço com sucesso, garantindo a integridade dos dados de Cliente e Veículo.
 * **Localização**: `src/test/resources/features/service_order.feature
 
+## 🛡️ Resiliência
+* **Retry com espera crescente**: 3 tentativas (1s, 2s) antes de desistir de uma mensagem.
+* **DLQ**: mensagens que falham em todas as tentativas vão para `oficina-os-service.dlq`, com o motivo da falha nos headers (`x-exception-message`, `x-exception-stacktrace`).
+* **Idempotência**: eventos reentregues não repetem efeitos: se a OS já está no status pedido, nada é alterado e nenhum e-mail é reenviado.
+
+## ⚙️ Configuração
+
+Nenhum segredo fica no código. Os valores padrão de `application.properties` servem só para desenvolvimento local; em outros ambientes, use variáveis de ambiente (veja `.env.example`). No Kubernetes, os valores vêm do Secret `oficina-secrets` (modelo em `oficina-infra-k8s/secrets.example.yaml`).
+
 ## 🐳 Como rodar a aplicação
 
-1. Certifique-se de que o **RabbitMQ** e o **Banco de Dados** (MySQL/PostgreSQL) estejam rodando (via Docker Compose na raiz do projeto).
-2. Execute o comando:
+1. Suba as dependências (bancos, RabbitMQ, MailHog) com o docker-compose do repositório [`oficina-infra-k8s`](https://github.com/oficina-mecanica-app/oficina-infra-k8s).
+2. Execute:
 
 ```bash
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
