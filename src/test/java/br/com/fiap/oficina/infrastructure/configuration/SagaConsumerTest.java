@@ -1,6 +1,9 @@
 package br.com.fiap.oficina.infrastructure.configuration;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 
 import br.com.fiap.oficina.application.service.ServiceOrderService;
 import br.com.fiap.oficina.domain.model.OrderStatus;
@@ -41,9 +45,10 @@ public class SagaConsumerTest {
     public void deveTratarErroNoPagamentoAprovado() {
         Map<String, Object> message = new HashMap<>();
 
-        sagaConsumer.handlePaymentApproved(message);
+        assertThrows(AmqpRejectAndDontRequeueException.class,
+                () -> sagaConsumer.handlePaymentApproved(message));
 
-        verify(service, never()).updateStatus(anyLong(), eq(OrderStatus.IN_PROGRESS));
+        verify(service, never()).updateStatus(anyLong(), any());
     }
 
     @Test
@@ -80,9 +85,10 @@ public class SagaConsumerTest {
     public void deveTratarErroNaExecucaoFinalizadaPorFaltaDeId() {
         Map<String, Object> message = new HashMap<>();
 
-        sagaConsumer.handleExecutionFinished(message);
+        assertThrows(AmqpRejectAndDontRequeueException.class,
+                () -> sagaConsumer.handleExecutionFinished(message));
 
-        verify(service, never()).updateStatus(anyLong(), eq(OrderStatus.COMPLETED));
+        verify(service, never()).updateStatus(anyLong(), any());
     }
 
     @Test
@@ -101,17 +107,51 @@ public class SagaConsumerTest {
         Map<String, Object> message = new HashMap<>();
         message.put("serviceOrderId", 60L);
 
-        sagaConsumer.handlePaymentLinkGenerated(message);
+        assertThrows(AmqpRejectAndDontRequeueException.class,
+                () -> sagaConsumer.handlePaymentLinkGenerated(message));
 
-        verify(service, never()).sendCheckoutEmail(anyLong(), eq("http://mercadopago.com/checkout"));
+        verify(service, never()).sendCheckoutEmail(anyLong(), anyString());
     }
 
     @Test
     public void deveTratarErroNoPagamentoRecusado() {
         Map<String, Object> message = new HashMap<>();
 
+        assertThrows(AmqpRejectAndDontRequeueException.class,
+                () -> sagaConsumer.handlePaymentRefused(message));
+
+        verify(service, never()).updateStatus(anyLong(), any());
+    }
+
+    @Test
+    public void deveAceitarChaveOsIdNoPagamentoRecusado() {
+        Map<String, Object> message = new HashMap<>();
+        message.put("osId", 70L);
+
         sagaConsumer.handlePaymentRefused(message);
 
-        verify(service, never()).updateStatus(anyLong(), eq(OrderStatus.REFUSED));
+        verify(service, times(1)).updateStatus(70L, OrderStatus.REFUSED);
+    }
+
+    @Test
+    public void deveRejeitarIdMalFormado() {
+        Map<String, Object> message = new HashMap<>();
+        message.put("serviceOrderId", "abc");
+
+        assertThrows(AmqpRejectAndDontRequeueException.class,
+                () -> sagaConsumer.handlePaymentApproved(message));
+
+        verify(service, never()).updateStatus(anyLong(), any());
+    }
+
+    @Test
+    public void devePropagarFalhaDoServicoParaPermitirRetry() {
+        Map<String, Object> message = new HashMap<>();
+        message.put("serviceOrderId", 80L);
+        org.mockito.Mockito.when(service.updateStatus(80L, OrderStatus.IN_PROGRESS))
+                .thenThrow(new IllegalStateException("banco indisponível"));
+
+        assertThrows(IllegalStateException.class,
+                () -> sagaConsumer.handlePaymentApproved(message));
     }
 }

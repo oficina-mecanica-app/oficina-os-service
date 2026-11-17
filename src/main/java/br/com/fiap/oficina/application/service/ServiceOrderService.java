@@ -78,6 +78,13 @@ public class ServiceOrderService {
     @Transactional
     public ServiceOrderData updateStatus(Long id, OrderStatus newStatus) {
         ServiceOrderData os = serviceOrderRepository.findById(id).orElseThrow();
+
+        // Idempotência: eventos podem ser reentregues (retry do RabbitMQ).
+        // Se a OS já está no status pedido, não repete efeitos colaterais (e-mail, cobrança).
+        if (os.getStatus() == newStatus) {
+            return os;
+        }
+
         os.setStatus(newStatus);
         
         if (newStatus == OrderStatus.AWAITING_APPROVAL) {

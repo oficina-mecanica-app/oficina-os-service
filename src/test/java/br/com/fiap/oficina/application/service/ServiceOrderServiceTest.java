@@ -305,4 +305,21 @@ public class ServiceOrderServiceTest {
         when(partRepository.findById(99L)).thenReturn(Optional.empty());
         assertThrows(RuntimeException.class, () -> service.addItems(1L, dto));
     }
+
+    @Test
+    public void naoDeveRepetirEfeitosQuandoStatusJaEstiverAtualizado() {
+        Long osId = 1L;
+        ServiceOrderData mockOs = new ServiceOrderData();
+        mockOs.setId(osId);
+        mockOs.setStatus(OrderStatus.IN_PROGRESS);
+
+        when(repository.findById(osId)).thenReturn(Optional.of(mockOs));
+
+        ServiceOrderData result = service.updateStatus(osId, OrderStatus.IN_PROGRESS);
+
+        assertEquals(OrderStatus.IN_PROGRESS, result.getStatus());
+        verify(repository, never()).save(any(ServiceOrderData.class));
+        verify(emailService, never()).sendStatusUpdateNotification(any());
+        verify(rabbitTemplate, never()).convertAndSend(anyString(), any(Object.class));
+    }
 }
