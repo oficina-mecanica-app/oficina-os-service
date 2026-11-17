@@ -23,10 +23,19 @@ spec:
           value: "jdbc:postgresql://postgres-service:5432/oficina_os"
         - name: SPRING_DATASOURCE_USERNAME
           value: "admin"
+        # Segredos vêm do Secret "oficina-secrets" (ver oficina-infra-k8s/secrets.example.yaml)
         - name: SPRING_DATASOURCE_PASSWORD
-          value: "admin_password"
+          valueFrom:
+            secretKeyRef:
+              name: oficina-secrets
+              key: postgres-password
         - name: SPRING_RABBITMQ_HOST
           value: "rabbitmq-service"
+        - name: SPRING_RABBITMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: oficina-secrets
+              key: rabbitmq-password
         - name: SPRING_MAIL_HOST
           value: "mailhog-service"
 ---
